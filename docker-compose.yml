@@ -1,0 +1,47 @@
+version: '2'
+
+services:
+
+  # Appi service
+  appi:
+    build: .
+    volumes:
+      - .:/srv/appi
+    environment:
+      NODE_ENV:      testing
+      LOG_LEVEL:     CRITICAL
+      DEBUG:         ava:watcher
+      APP_HOST:      '0.0.0.0'
+      APP_PORT:      '8123'
+      DB_URL:        mongodb://db:27017/appi_test
+      DB_POOL_SIZE:  20
+      AUTH_SECRET:   aFReMuDua2bpl2z2vuext36Ug7sc4Aec
+      AUTH_SALT:     3dSo4sNms1eEMnZzaFReMuDua2bpl2z2
+      AUTH_TTL:      1209600 # 1 week
+      OAUTH_COOKIE_PASSWORD: lXfBu8DK3qkkzS29O8iv0dFrVIxOaVBr
+      OAUTH_IS_SECURE:       'false'
+      OAUTH_FACEBOOK_ID:     283063502056890
+      OAUTH_FACEBOOK_SECRET: e8972e302556d5cfa9fd5d8658b79142
+      LOCAL_FS_PATH:         /var/appi-file-storage/
+      LOCAL_FS_EXTENSIONS:   jpg,jpeg,gif,png,txt,pdf
+      LOCAL_FS_MAX_SIZE:     52428800
+
+  # Integration test (test and exit mode)
+  appi_test_integration:
+    extends:
+      service: appi
+    command: ./node_modules/.bin/ava --verbose dist/**/*.test-integration.js
+    depends_on:
+      - db
+
+  # Integration test (continious watch mode)
+  appi_test_integration_watch:
+    extends:
+      service: appi
+    command: ./node_modules/.bin/ava --verbose dist/**/*.test-integration.js --watch
+    depends_on:
+      - db
+
+  # Database
+  db:
+    image: mongo:latest
