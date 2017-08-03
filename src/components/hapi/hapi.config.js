@@ -15,8 +15,8 @@ export function getConfig(env) {
          * @type {number}
          */
         HTTP_POST_MAX_BODY_SIZE = 50 * 1024 * 1024,
-        CORS = false,
     } = env
+    const CORS = env.CORS === undefined ? false : true
 
     return {
         data: {
